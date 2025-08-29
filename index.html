@@ -1,0 +1,166 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Selaab Perfumes</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #f8f8f8;
+      color: #333;
+    }
+    header {
+      background: #D4A017; /* Changed to matte gold */
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      color: white;
+    }
+    header h1 {
+      font-size: 4rem;
+      letter-spacing: 3px;
+    }
+    header p {
+      font-size: 1.5rem;
+      margin-top: 10px;
+    }
+    nav {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 15px;
+      text-align: center;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 20px;
+      font-size: 1.1rem;
+    }
+    section {
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .products {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .product-card {
+      background: white;
+      padding: 20px;
+      width: 250px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .product-card img {
+      width: 100%;
+      border-radius: 10px;
+    }
+    footer {
+      background: #222;
+      color: rgb(167, 42, 42);
+      padding: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="#home">Home</a>
+    <a href="#products">Products</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+  </nav>
+
+  <header id="home">
+    <h1>Selaab</h1>
+    <p>Where elegance meets fragrance</p>
+  </header>
+
+  <section id="products">
+    <h2>Our Perfumes</h2>
+    <div class="products">
+      <div class="product-card">
+        <img src="perfume1.jpg" alt="Perfume 1">
+        <h3>JANAN</h3>
+        <p>Delicate floral fragrance with a hint of luxury.</p>
+      </div>
+      <div class="product-card">
+        <img src="perfume2.jpg" alt="Perfume 2">
+        <h3>Ocean Breeze</h3>
+        <p>Fresh aquatic scent that awakens your senses.</p>
+      </div>
+      <div class="product-card">
+        <img src="perfume3.jpg" alt="Perfume 3">
+        <h3>Oud Mystique</h3>
+        <p>Rich and exotic aroma for timeless elegance.</p>
+      </div>
+    </div>
+  </section>
+</body>
+</html>
+
+  <section id="about">
+    <h2>About Selaab</h2>
+    <p>Selaab is a luxury perfume brand that captures emotions through scents. 
+       Our mission is to craft fragrances that leave a lasting impression.</p>
+  </section>
+
+  <section id="contact">
+    <h2>Contact Us</h2>
+    <p>Email: contact@selaab.com</p>
+    <p>Instagram: @selaabperfumes</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 Selaab Perfumes. All rights reserved.</p>
+  </footer>
+</body>
+</html>
